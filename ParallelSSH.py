@@ -87,6 +87,7 @@ class ParallelSSH:
 
         self.cmd_successes=[]
         self.cmd_failures=[]
+        running_procs=[]
 
         #base SSH command
         ssh_cmd=[self.ssh_bin, "-nqo", "BatchMode=yes"]
@@ -96,16 +97,11 @@ class ParallelSSH:
         def get_hostname(process):
             return(process.args[3])
 
-        running_procs=[]
-
         while True:
-            #if there are processes waiting and free spots, add them
+            #initialize SSH processes until max_procs is reached
             while len(running_procs) < self.max_procs and len(cmds_to_run) > 0: 
-                #start process and append to running procs as (proc, start_time)
                 running_procs.append([subprocess.Popen(cmds_to_run.pop(), stdout=subprocess.PIPE, stderr=subprocess.PIPE), datetime.now()])
 
-
-            #if no procs left and no cmds left to run, finished
             if len(running_procs)==0 and len(cmds_to_run)==0:
                 break
 
